@@ -1,26 +1,27 @@
--- DROP TABLE download_settings;
-CREATE TABLE download_settings (
+-- DROP TABLE binance_download_settings;
+CREATE TABLE binance_download_settings (
   `download_settings_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `market` varchar(10) DEFAULT NULL,
   `tick_interval` varchar(10) DEFAULT NULL,
+  `stock_type` varchar(255) DEFAULT NULL,  
   `stock_exchange` varchar(255) DEFAULT NULL,  
-  `api_range_to_overwrite` int(11) DEFAULT NULL,  
+  `api_range_to_overwrite` int(11) DEFAULT NULL,  -- in seconds
   `download_priority`int(11) NOT NULL,  
   `download_interval_sec`int(11) NOT NULL,  
   `download_setting_status_id` int(11) DEFAULT NULL,
   `download_settings_desc` varchar(255) DEFAULT NULL,
-  `download_current_update_from_api`  int(11) DEFAULT NULL,
-  `daily_update_from_files`  int(11) DEFAULT NULL,
-  `monthly_update_from_files`  int(11) DEFAULT NULL,
-  `start_download_timestamp`  int(11) DEFAULT NULL,
-  `last_download_timestamp` bigint DEFAULT NULL,
-  `next_download_timestamp` bigint DEFAULT NULL,
-  `update_timestamp` timestamp NULL DEFAULT NULL,
-  `insert_timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+  `download_current_update_from_api`  int(1) DEFAULT 1,
+  `daily_update_from_files`  int(1) DEFAULT 1,
+  `monthly_update_from_files`  int(1) DEFAULT 1,
+  `start_download_utc_timestamp` timestamp DEFAULT '2017-01-01 00:00:00',
+  `last_download_utc_timestamp` timestamp DEFAULT NULL,
+  `next_download_utc_timestamp` timestamp DEFAULT NULL,
+  `update_utc_timestamp` timestamp NULL DEFAULT NULL,
+  `insert_utc_timestamp` timestamp NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- DROP TABLE klines_binance;
-CREATE TABLE `klines_binance` (
+-- DROP TABLE binance_klines_data;
+CREATE TABLE `binance_klines_data` (
   `open_time` bigint(20) DEFAULT NULL,
   `open` double DEFAULT NULL,
   `high` double DEFAULT NULL,
@@ -41,8 +42,8 @@ CREATE TABLE `klines_binance` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
--- DROP TABLE historical_update_data_log;
-CREATE TABLE historical_update_data_log (
+-- DROP TABLE binance_hist_update_data_log;
+CREATE TABLE binance_hist_update_data_log (
   `historical_data_log_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `market` varchar(10) DEFAULT NULL,
   `tick_interval` varchar(10) DEFAULT NULL,
@@ -56,8 +57,8 @@ CREATE TABLE historical_update_data_log (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
--- DROP VIEW `vw_klines_binance_anl`;
-CREATE VIEW `vw_klines_binance_anl` AS
+-- DROP VIEW `vw_binance_klines_anl`;
+CREATE VIEW `vw_binance_klines_anl` AS
     SELECT 
         `a`.`open_time` AS `open_time`,
         `a`.`open` AS `open`,
@@ -83,13 +84,18 @@ CREATE VIEW `vw_klines_binance_anl` AS
 
 
 -- some usefull data
-INSERT INTO download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '1m', 'Binance SPOT', 20, 100, 120, 0);
-INSERT INTO download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '5m', 'Binance SPOT', 10, 200, 120, 0);
-INSERT INTO download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '15m', 'Binance SPOT', 10, 300, 120, 0);
-INSERT INTO download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '30m', 'Binance SPOT', 10, 400, 120, 0);
-INSERT INTO download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '1h', 'Binance SPOT', 5, 500, 1200, 0);
-INSERT INTO download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '2h', 'Binance SPOT', 2, 600, 1200, 0);
-INSERT INTO download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '4h', 'Binance SPOT', 2, 700, 1200, 0);
-INSERT INTO download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '1d', 'Binance SPOT', 2, 800, 12000, 0);
-INSERT INTO download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '1w', 'Binance SPOT', 2, 900, 12000, 0);
-INSERT INTO download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '1M', 'Binance SPOT', 2, 1000, 12000, 0);
+INSERT INTO binance_download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '1m', 'Binance SPOT', 20, 100, 120, 0);
+INSERT INTO binance_download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '5m', 'Binance SPOT', 10, 200, 120, 0);
+INSERT INTO binance_download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '15m', 'Binance SPOT', 10, 300, 120, 0);
+INSERT INTO binance_download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '30m', 'Binance SPOT', 10, 400, 120, 0);
+INSERT INTO binance_download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '1h', 'Binance SPOT', 5, 500, 1200, 0);
+INSERT INTO binance_download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '2h', 'Binance SPOT', 2, 600, 1200, 0);
+INSERT INTO binance_download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '4h', 'Binance SPOT', 2, 700, 1200, 0);
+INSERT INTO binance_download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '1d', 'Binance SPOT', 2, 800, 12000, 0);
+INSERT INTO binance_download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '1w', 'Binance SPOT', 2, 900, 12000, 0);
+INSERT INTO binance_download_settings (market, tick_interval, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, next_download_timestamp) VALUES ('BTCUSDT', '1M', 'Binance SPOT', 2, 1000, 12000, 0);
+
+
+
+
+select * from download_settings
