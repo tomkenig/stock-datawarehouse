@@ -29,7 +29,7 @@ cursor = cnxn.cursor()
 
 ts = str(math.floor(datetime.datetime.now().timestamp()))
 
-cursor.execute("SELECT download_settings_id, market, tick_interval, stock_exchange, api_range_to_overwrite, download_interval_sec FROM " + db_schema_name + "." + db_settings_table_name + " WHERE next_download_timestamp <= " + ts + " order by next_download_timestamp asc limit 1")
+cursor.execute("SELECT download_settings_id, market, tick_interval, stock_exchange, api_range_to_overwrite, download_interval_sec FROM " + db_schema_name + "." + db_settings_table_name + " WHERE next_download_ux_timestamp <= " + ts + " order by next_download_ux_timestamp asc limit 1")
 download_setting = cursor.fetchall()
 download_settings_id = download_setting[0][0]
 market = download_setting[0][1]
