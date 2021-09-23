@@ -36,6 +36,7 @@ CREATE TABLE `binance_klines_data` (
   `ignore` int(11) DEFAULT NULL,
   `market` varchar(10) DEFAULT NULL,
   `tick_interval` varchar(10) DEFAULT NULL,
+  `stock_type` varchar(255) DEFAULT NULL,  
   `stock_exchange` varchar(255) DEFAULT NULL,  
   `update_ux_timestamp` int(10) NULL,
   `insert_ux_timestamp` int(10) NULL
@@ -46,7 +47,8 @@ CREATE TABLE `binance_klines_data` (
 CREATE TABLE binance_hist_update_data_log (
   `historical_data_log_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `market` varchar(10) DEFAULT NULL,
-  `tick_interval` varchar(10) DEFAULT NULL,
+  `tick_interval` varchar(255) DEFAULT NULL,
+  `stock_type` varchar(255) DEFAULT NULL,  
   `stock_exchange` varchar(255) DEFAULT NULL,
   `file_interval` varchar(255) DEFAULT NULL,
   `hist_date_name` varchar(255) DEFAULT NULL,
@@ -75,7 +77,7 @@ CREATE VIEW `vw_binance_klines_anl` AS
         `a`.`market` AS `market`,
         `a`.`tick_interval` AS `tick_interval`,
         `a`.`stock_exchange` AS `stock_exchange`,
-        `a`.`insert_timestamp` AS `insert_timestamp`,
+        `a`.`insert_ux_timestamp` AS `insert_timestamp`,
         FROM_UNIXTIME((`a`.`open_time` / 1000)) AS `open_datetime`,
         FROM_UNIXTIME((`a`.`close_time` / 1000)) AS `close_datetime`
     FROM
@@ -84,19 +86,19 @@ CREATE VIEW `vw_binance_klines_anl` AS
 
 
 -- some usefull data
-INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec) VALUES ('BTCUSDT', '1m', 'Binance.com', 'spot', 20, 100, 120);
-INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec) VALUES ('BTCUSDT', '5m', 'Binance.com', 'spot', 10, 200, 120);
-INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec) VALUES ('BTCUSDT', '15m', 'Binance.com', 'spot', 10, 300, 120);
-INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec) VALUES ('BTCUSDT', '30m', 'Binance.com', 'spot', 10, 400, 120);
-INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec) VALUES ('BTCUSDT', '1h', 'Binance.com', 'spot', 5, 500, 1200);
-INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec) VALUES ('BTCUSDT', '2h', 'Binance.com', 'spot', 2, 600, 1200);
-INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec) VALUES ('BTCUSDT', '4h', 'Binance.com', 'spot', 2, 700, 1200);
-INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec) VALUES ('BTCUSDT', '6h', 'Binance.com', 'spot', 2, 700, 1200);
-INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec) VALUES ('BTCUSDT', '8h', 'Binance.com', 'spot', 2, 700, 1200);
-INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec) VALUES ('BTCUSDT', '12h', 'Binance.com', 'spot', 2, 700, 1200);
-INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec) VALUES ('BTCUSDT', '1d', 'Binance.com', 'spot', 2, 800, 12000);
-INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec) VALUES ('BTCUSDT', '1w', 'Binance.com', 'spot', 2, 900, 12000);
-INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec) VALUES ('BTCUSDT', '1M', 'Binance.com', 'spot', 2, 1000, 12000);
+INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, insert_ux_timestamp) VALUES ('BTCUSDT', '1m', 'spot', 'Binance.com', 20, 100, 120, unix_timestamp());
+INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, insert_ux_timestamp) VALUES ('BTCUSDT', '5m', 'spot', 'Binance.com', 10, 200, 120, unix_timestamp());
+INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, insert_ux_timestamp) VALUES ('BTCUSDT', '15m', 'spot', 'Binance.com', 10, 300, 120, unix_timestamp());
+INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, insert_ux_timestamp) VALUES ('BTCUSDT', '30m', 'spot', 'Binance.com', 10, 400, 120, unix_timestamp());
+INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, insert_ux_timestamp) VALUES ('BTCUSDT', '1h', 'spot', 'Binance.com', 5, 500, 1200, unix_timestamp());
+INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, insert_ux_timestamp) VALUES ('BTCUSDT', '2h', 'spot', 'Binance.com', 2, 600, 1200, unix_timestamp());
+INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, insert_ux_timestamp) VALUES ('BTCUSDT', '4h', 'spot', 'Binance.com', 2, 700, 1200, unix_timestamp());
+INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, insert_ux_timestamp) VALUES ('BTCUSDT', '6h', 'spot', 'Binance.com', 2, 700, 1200, unix_timestamp());
+INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, insert_ux_timestamp) VALUES ('BTCUSDT', '8h', 'spot', 'Binance.com', 2, 700, 1200, unix_timestamp());
+INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, insert_ux_timestamp) VALUES ('BTCUSDT', '12h', 'spot', 'Binance.com', 2, 700, 1200, unix_timestamp());
+INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, insert_ux_timestamp) VALUES ('BTCUSDT', '1d', 'spot', 'Binance.com', 2, 800, 12000, unix_timestamp());
+INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, insert_ux_timestamp) VALUES ('BTCUSDT', '1w', 'spot', 'Binance.com', 2, 900, 12000, unix_timestamp());
+INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, insert_ux_timestamp) VALUES ('BTCUSDT', '1M', 'spot', 'Binance.com', 2, 1000, 12000, unix_timestamp());
 
 
 select * from binance_download_settings;
