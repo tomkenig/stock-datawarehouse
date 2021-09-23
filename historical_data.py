@@ -14,7 +14,7 @@ dodatkowo warto zbudowac macierz, ktora pokaze braki, jesli sa
 import requests
 import mysql.connector  # https://dev.mysql.com/doc/connector-python/en/
 import json
-import datetime
+from datetime import datetime, timedelta
 import math
 import zipfile
 import csv
@@ -37,42 +37,65 @@ db_settings_table_name = sql_db_conn["db_settings_table_name"]  # settings table
 # open db connection
 cursor = cnxn.cursor()
 
-#https://data.binance.vision/?prefix=data/spot/daily/klines/BTCUSDT/
-BASE_URL = 'https://data.binance.vision/data/spot/daily/klines/BTCUSDT/1m/BTCUSDT-1m-2021-03-17.zip'
-FILE_LENGTH = 'daily'
-TYPE = 'klines'
 
-ts = str(math.floor(datetime.datetime.now().timestamp()))
+
+DAILY_HISTORY_DAYS = 3
 
 market = 'BTCUSDT'
 tick_interval = '1m'
 stock_type = 'spot'
 stock_exchange = 'Binance.com'
 
-# todo: filenames to download
-def get_filenames_to_download(file_interval_):
-    print("todo")
 
 
+# todo: filenames to download # daily first in dev. Max Last 62 days
+def get_filenames_to_download():
+    # todo: if is records get last + 1, else get all historical from last 62 days. GET ALSO MISSING DAYS <MAYBE OTHER FUNCTION WILL BE BETTER TO DO THIS????
+    start_date = datetime.strptime(str(datetime.now() - timedelta(days=62))[0:10], "%Y-%m-%d")
+    end_date = datetime.strptime(str(datetime.now() - timedelta(days=0))[0:10], "%Y-%m-%d")
+    delta = end_date - start_date
+    l = []
+    for i in range(delta.days + 1):
+        day = start_date + timedelta(days=i)
+        l.insert(i, str(day)[0:10])
+        # print(day)
+    return (l)
 
+print(get_filenames_to_download())
+
+sssss = get_filenames_to_download()[0]
+
+print(sssss)
+
+
+#https://data.binance.vision/?prefix=data/spot/daily/klines/BTCUSDT/
+
+FILE_LENGTH = 'daily'
+TYPE = 'klines'
+APP_PATH = "tmp/"
+FILENAME = "" + market +"-"+ tick_interval +"-"+ sssss +""
+FILE_PATH = APP_PATH + FILENAME
+BASE_URL = "https://data.binance.vision/data/"+stock_type+"/"+FILE_LENGTH+"/"+TYPE+"/"+market+"/"+tick_interval+"/"+FILENAME+".zip"
+
+print(FILE_PATH)
 
 
 # todo: file import
 r = requests.get(BASE_URL)
-open('tmp/BTCUSDT-1m-2017-03-17.zip', 'wb').write(r.content)
+open("tmp/" + market +"-"+ tick_interval +"-"+ sssss +".zip", "wb").write(r.content)
 
 # todo: zip unpack
-with zipfile.ZipFile("tmp/BTCUSDT-1m-2017-03-17.zip", "r") as zip_ref:
+with zipfile.ZipFile("tmp/" + market +"-"+ tick_interval +"-"+ sssss +".zip", "r") as zip_ref:
     zip_ref.extractall("tmp")
 
 # insert file into DBMS
-csv_data = csv.reader(open('tmp/BTCUSDT-1m-2017-03-17.csv'))
+csv_data = csv.reader(open("tmp/" + market +"-"+ tick_interval +"-"+ sssss +".csv"))
 open_time_min = min(csv_data)[0]
 
-csv_data = csv.reader(open('tmp/BTCUSDT-1m-2017-03-17.csv'))
+csv_data = csv.reader(open("tmp/" + market +"-"+ tick_interval +"-"+ sssss +".csv"))
 open_time_max = max(csv_data)[0]
 
-csv_data = csv.reader(open('tmp/BTCUSDT-1m-2017-03-17.csv'))
+csv_data = csv.reader(open("tmp/" + market +"-"+ tick_interval +"-"+ sssss +".csv"))
 # delete old data to overwrite
 cursor.execute(
     "DELETE FROM " + db_schema_name + "." + db_table_name + " where open_time >= %s and open_time <= %s and tick_interval = %s and market = %s and stock_type = %s and stock_exchange = %s",
