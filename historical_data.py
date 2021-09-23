@@ -1,3 +1,15 @@
+"""
+miesiecznie - 1 dnia kazdego miesiaca - jkis if z funkcja na koncu
+miesiecznie takze dla brakow
+dzienne = codziennie na zakonczenie dnia
+dziennine - takze dla brakow
+
+warunek wejscia - download_daily/monthly from files
+
+dodatkowo warto zbudowac macierz, ktora pokaze braki, jesli sa
+
+"""
+
 # libs
 import requests
 import mysql.connector  # https://dev.mysql.com/doc/connector-python/en/
@@ -36,6 +48,14 @@ market = 'BTCUSDT'
 tick_interval = '1m'
 stock_type = 'spot'
 stock_exchange = 'Binance.com'
+
+# todo: filenames to download
+def get_filenames_to_download(file_interval_):
+    print("todo")
+
+
+
+
 
 # todo: file import
 r = requests.get(BASE_URL)
