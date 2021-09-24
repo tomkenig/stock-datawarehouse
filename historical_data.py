@@ -37,16 +37,17 @@ db_settings_table_name = sql_db_conn["db_settings_table_name"]  # settings table
 # open db connection
 cursor = cnxn.cursor()
 
-
+cursor.execute("SELECT download_settings_id, market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_interval_sec, daily_update_from_files, monthly_update_from_files FROM " + db_schema_name + "." + db_settings_table_name + "  order by start_download_ux_timestamp asc limit 1")
+download_setting = cursor.fetchall()
+download_settings_id = download_setting[0][0]
+market = download_setting[0][1]
+tick_interval = download_setting[0][2]
+stock_type = download_setting[0][3]
+stock_exchange = download_setting[0][4]
+range_to_download = download_setting[0][5]
+download_interval_sec = download_setting[0][6]
 
 DAILY_HISTORY_DAYS = 3
-
-market = 'BTCUSDT'
-tick_interval = '1m'
-stock_type = 'spot'
-stock_exchange = 'Binance.com'
-
-
 
 # todo: filenames to download # daily first in dev. Max Last 62 days
 def get_filenames_to_download():
@@ -62,13 +63,10 @@ def get_filenames_to_download():
     return (l)
 
 print(get_filenames_to_download())
-
 sssss = get_filenames_to_download()[0]
-
 print(sssss)
 
 
-#https://data.binance.vision/?prefix=data/spot/daily/klines/BTCUSDT/
 
 FILE_LENGTH = 'daily'
 TYPE = 'klines'
