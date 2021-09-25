@@ -52,59 +52,65 @@ DAILY_HISTORY_DAYS = 3
 # todo: filenames to download # daily first in dev. Max Last 62 days
 def get_filenames_to_download():
     # todo: if is records get last + 1, else get all historical from last 62 days. GET ALSO MISSING DAYS <MAYBE OTHER FUNCTION WILL BE BETTER TO DO THIS????
-    start_date = datetime.strptime(str(datetime.now() - timedelta(days=62))[0:10], "%Y-%m-%d")
-    end_date = datetime.strptime(str(datetime.now() - timedelta(days=0))[0:10], "%Y-%m-%d")
+    start_date = datetime.strptime(str(datetime.utcnow() - timedelta(days=62))[0:10], "%Y-%m-%d")
+    end_date = datetime.strptime(str(datetime.utcnow() - timedelta(days=1))[0:10], "%Y-%m-%d")
     delta = end_date - start_date
     l = []
     for i in range(delta.days + 1):
         day = start_date + timedelta(days=i)
-        l.insert(i, str(day)[0:10])
+        l.insert(i, "" + market +"-"+ tick_interval +"-"+ str(day)[0:10] +"")
         # print(day)
     return (l)
 
 print(get_filenames_to_download())
-sssss = get_filenames_to_download()[0]
-print(sssss)
-
-
 
 FILE_LENGTH = 'daily'
 TYPE = 'klines'
 APP_PATH = "tmp/"
-FILENAME = "" + market +"-"+ tick_interval +"-"+ sssss +""
+
+
+
+
+
+
+def get_files():
+    # todo: file import
+    r = requests.get(BASE_URL)
+    open(FILE_PATH + ".zip", "wb").write(r.content)
+
+    # todo: zip unpack
+    with zipfile.ZipFile(FILE_PATH + ".zip", "r") as zip_ref:
+        zip_ref.extractall("tmp")
+
+    # insert file into DBMS
+    csv_data = csv.reader(open(FILE_PATH +".csv"))
+    open_time_min = min(csv_data)[0]
+
+    csv_data = csv.reader(open(FILE_PATH +".csv"))
+    open_time_max = max(csv_data)[0]
+
+    csv_data = csv.reader(open(FILE_PATH +".csv"))
+    # delete old data to overwrite
+    cursor.execute(
+        "DELETE FROM " + db_schema_name + "." + db_table_name + " where open_time >= %s and open_time <= %s and tick_interval = %s and market = %s and stock_type = %s and stock_exchange = %s",
+        (open_time_min, open_time_max, tick_interval, market, stock_type, stock_exchange))
+    print("delete done")
+
+    # insert data
+    for i in csv_data:
+        cursor.execute("INSERT INTO " + db_schema_name+"."+db_table_name +"(open_time, open, high, low, close, volume, close_time, quote_asset_volume, number_of_trades, taker_buy_base_asset_volume, taker_buy_quote_asset_volume, `ignore`, market, tick_interval, stock_type, stock_exchange) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], i[11], market, tick_interval, stock_type, stock_exchange))
+        print(i)
+    cnxn.commit()
+    cursor.close()
+    cnxn.close()
+    print("insert done")
+
+
+FILENAME_LIST = get_filenames_to_download()
+
+FILENAME = FILENAME_LIST[0]
 FILE_PATH = APP_PATH + FILENAME
 BASE_URL = "https://data.binance.vision/data/"+stock_type+"/"+FILE_LENGTH+"/"+TYPE+"/"+market+"/"+tick_interval+"/"+FILENAME+".zip"
 
 print(FILE_PATH)
-
-
-# todo: file import
-r = requests.get(BASE_URL)
-open("tmp/" + market +"-"+ tick_interval +"-"+ sssss +".zip", "wb").write(r.content)
-
-# todo: zip unpack
-with zipfile.ZipFile("tmp/" + market +"-"+ tick_interval +"-"+ sssss +".zip", "r") as zip_ref:
-    zip_ref.extractall("tmp")
-
-# insert file into DBMS
-csv_data = csv.reader(open("tmp/" + market +"-"+ tick_interval +"-"+ sssss +".csv"))
-open_time_min = min(csv_data)[0]
-
-csv_data = csv.reader(open("tmp/" + market +"-"+ tick_interval +"-"+ sssss +".csv"))
-open_time_max = max(csv_data)[0]
-
-csv_data = csv.reader(open("tmp/" + market +"-"+ tick_interval +"-"+ sssss +".csv"))
-# delete old data to overwrite
-cursor.execute(
-    "DELETE FROM " + db_schema_name + "." + db_table_name + " where open_time >= %s and open_time <= %s and tick_interval = %s and market = %s and stock_type = %s and stock_exchange = %s",
-    (open_time_min, open_time_max, tick_interval, market, stock_type, stock_exchange))
-print("delete done")
-
-# insert data
-for i in csv_data:
-    cursor.execute("INSERT INTO " + db_schema_name+"."+db_table_name +"(open_time, open, high, low, close, volume, close_time, quote_asset_volume, number_of_trades, taker_buy_base_asset_volume, taker_buy_quote_asset_volume, `ignore`, market, tick_interval, stock_type, stock_exchange) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], i[11], market, tick_interval, stock_type, stock_exchange))
-    print(i)
-cnxn.commit()
-cursor.close()
-cnxn.close()
-print("insert done")
+get_files()
