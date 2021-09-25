@@ -47,12 +47,12 @@ stock_exchange = download_setting[0][4]
 range_to_download = download_setting[0][5]
 download_interval_sec = download_setting[0][6]
 
-DAILY_HISTORY_DAYS = 3
+DAILY_HISTORY_DAYS = 10
 
 # todo: filenames to download # daily first in dev. Max Last 62 days
 def get_filenames_to_download():
     # todo: if is records get last + 1, else get all historical from last 62 days. GET ALSO MISSING DAYS <MAYBE OTHER FUNCTION WILL BE BETTER TO DO THIS????
-    start_date = datetime.strptime(str(datetime.utcnow() - timedelta(days=62))[0:10], "%Y-%m-%d")
+    start_date = datetime.strptime(str(datetime.utcnow() - timedelta(days=DAILY_HISTORY_DAYS))[0:10], "%Y-%m-%d")
     end_date = datetime.strptime(str(datetime.utcnow() - timedelta(days=1))[0:10], "%Y-%m-%d")
     delta = end_date - start_date
     l = []
@@ -62,15 +62,10 @@ def get_filenames_to_download():
         # print(day)
     return (l)
 
-print(get_filenames_to_download())
 
 FILE_LENGTH = 'daily'
 TYPE = 'klines'
 APP_PATH = "tmp/"
-
-
-
-
 
 
 def get_files():
@@ -100,17 +95,19 @@ def get_files():
     for i in csv_data:
         cursor.execute("INSERT INTO " + db_schema_name+"."+db_table_name +"(open_time, open, high, low, close, volume, close_time, quote_asset_volume, number_of_trades, taker_buy_base_asset_volume, taker_buy_quote_asset_volume, `ignore`, market, tick_interval, stock_type, stock_exchange) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], i[11], market, tick_interval, stock_type, stock_exchange))
         print(i)
-    cnxn.commit()
-    cursor.close()
-    cnxn.close()
-    print("insert done")
 
+    print("insert done")
 
 FILENAME_LIST = get_filenames_to_download()
 
-FILENAME = FILENAME_LIST[0]
-FILE_PATH = APP_PATH + FILENAME
-BASE_URL = "https://data.binance.vision/data/"+stock_type+"/"+FILE_LENGTH+"/"+TYPE+"/"+market+"/"+tick_interval+"/"+FILENAME+".zip"
+for j in FILENAME_LIST:
+    FILENAME = j
+    FILE_PATH = APP_PATH + FILENAME
+    BASE_URL = "https://data.binance.vision/data/"+stock_type+"/"+FILE_LENGTH+"/"+TYPE+"/"+market+"/"+tick_interval+"/"+FILENAME+".zip"
 
-print(FILE_PATH)
-get_files()
+    print(FILE_PATH)
+    get_files()
+
+cnxn.commit()
+cursor.close()
+cnxn.close()
