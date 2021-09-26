@@ -13,8 +13,10 @@ CREATE TABLE binance_download_settings (
   `download_current_update_from_api`  int(1) DEFAULT 1,
   `daily_update_from_files`  int(1) DEFAULT 1,
   `monthly_update_from_files`  int(1) DEFAULT 1,
+  `daily_hist_first_run` int(1) DEFAULT 0,
+  `monthly_hist_first_run`  int(1) DEFAULT 0,  
   `daily_hist_complete` int(1) DEFAULT 0,
-  `daily_hist_complete`  int(1) DEFAULT 0,  
+  `monthly_hist_complete`  int(1) DEFAULT 0,  
   `start_download_ux_timestamp` int(10) DEFAULT 1483225200, -- 2017/01/01 00:00:00
   `last_download_ux_timestamp` int(10) NULL,
   `next_download_ux_timestamp` int(10) NULL,

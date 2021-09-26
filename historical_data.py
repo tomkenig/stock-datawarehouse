@@ -8,6 +8,8 @@ warunek wejscia - download_daily/monthly from files
 
 dodatkowo warto zbudowac macierz, ktora pokaze braki, jesli sa
 
+MONTHLY DATA FIRST THAN DAILY -
+add rollbacks and commits
 """
 
 # libs
@@ -47,10 +49,29 @@ stock_exchange = download_setting[0][4]
 range_to_download = download_setting[0][5]
 download_interval_sec = download_setting[0][6]
 
-DAILY_HISTORY_DAYS = 10
+
+# todo: function get single setting to download: curr, daily, monthly
+
+def get_settings():
+    cursor = cnxn.cursor()
+
+    cursor.execute( "SELECT download_settings_id, market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_interval_sec, daily_update_from_files, monthly_update_from_files FROM " + db_schema_name + "." + db_settings_table_name + "  order by start_download_ux_timestamp asc limit 1")
+    download_setting = cursor.fetchall()
+    download_settings_id = download_setting[0][0]
+    market = download_setting[0][1]
+    tick_interval = download_setting[0][2]
+    stock_type = download_setting[0][3]
+    stock_exchange = download_setting[0][4]
+    range_to_download = download_setting[0][5]
+    download_interval_sec = download_setting[0][6]
+
+
+
+
+DAILY_HISTORY_DAYS = 3
 
 # todo: filenames to download # daily first in dev. Max Last 62 days
-def get_filenames_to_download():
+def get_filenames_to_download_daily():
     # todo: if is records get last + 1, else get all historical from last 62 days. GET ALSO MISSING DAYS <MAYBE OTHER FUNCTION WILL BE BETTER TO DO THIS????
     start_date = datetime.strptime(str(datetime.utcnow() - timedelta(days=DAILY_HISTORY_DAYS))[0:10], "%Y-%m-%d")
     end_date = datetime.strptime(str(datetime.utcnow() - timedelta(days=1))[0:10], "%Y-%m-%d")
@@ -98,7 +119,10 @@ def get_files():
 
     print("insert done")
 
-FILENAME_LIST = get_filenames_to_download()
+
+
+
+FILENAME_LIST = get_filenames_to_download_daily()
 
 for j in FILENAME_LIST:
     FILENAME = j
