@@ -40,7 +40,7 @@ db_settings_table_name = sql_db_conn["db_settings_table_name"]  # settings table
 # open db connection
 cursor = cnxn.cursor()
 
-cursor.execute("SELECT download_settings_id, market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_interval_sec, daily_update_from_files, monthly_update_from_files FROM " + db_schema_name + "." + db_settings_table_name + " WHERE daily_update_from_files = 1 order by start_download_ux_timestamp asc limit 1")
+cursor.execute("SELECT download_settings_id, market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_interval_sec, daily_update_from_files, monthly_update_from_files FROM " + db_schema_name + "." + db_settings_table_name + " WHERE daily_update_from_files = 1 and daily_hist_complete = 0 order by start_download_ux_timestamp asc limit 1")
 download_setting = cursor.fetchall()
 download_settings_id = download_setting[0][0]
 market = download_setting[0][1]
@@ -155,6 +155,12 @@ def get_monthly_files():
     print("insert done")
 
 
+def daily_hist_update():
+    print("todo")
+
+def monthly_hist_update():
+    print("todo")
+
 
 FILENAME_LIST_DAILY = get_filenames_to_download_daily()
 
@@ -168,7 +174,7 @@ try:
 except:
     print("error_1")
 
-
+# todo: repair current month error
 FILENAME_LIST_MONTHLY = get_filenames_to_download_monthly()
 # monthly
 try:
