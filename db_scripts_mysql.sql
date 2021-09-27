@@ -105,5 +105,4 @@ INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_
 INSERT INTO binance_download_settings (market, tick_interval, stock_type, stock_exchange, api_range_to_overwrite, download_priority, download_interval_sec, daily_update_from_files, monthly_update_from_files, insert_ux_timestamp) VALUES ('BTCUSDT', '1M', 'spot', 'Binance.com', 2, 1000, 12000, 0, 1, unix_timestamp());
 
 
-select * from binance_download_settings;
 
