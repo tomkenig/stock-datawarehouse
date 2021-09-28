@@ -155,6 +155,8 @@ def get_monthly_files():
     print("insert done")
 
 
+
+
 def daily_hist_update():
     print("todo")
 
@@ -165,14 +167,16 @@ def monthly_hist_update():
 FILENAME_LIST_DAILY = get_filenames_to_download_daily()
 
 # daily files
+
 try:
     for j in FILENAME_LIST_DAILY:
         FILENAME = j
         FILE_PATH = APP_PATH + FILENAME
         BASE_URL = "https://data.binance.vision/data/"+stock_type+"/daily/"+TYPE+"/"+market+"/"+tick_interval+"/"+FILENAME+".zip"
         get_daily_files()
+        cnxn.commit()
 except:
-    print("error_1")
+     print("error_1")
 
 # todo: repair current month error
 FILENAME_LIST_MONTHLY = get_filenames_to_download_monthly()
@@ -183,12 +187,12 @@ try:
         FILE_PATH = APP_PATH + FILENAME
         BASE_URL = "https://data.binance.vision/data/"+stock_type+"/monthly/"+TYPE+"/"+market+"/"+tick_interval+"/"+FILENAME+".zip"
         get_monthly_files()
+        cnxn.commit()
 except:
     print("error_2")
-
-
 
 
 cnxn.commit()
 cursor.close()
 cnxn.close()
+# todo : there is a problem: on 0.15 ther in no new file daily in the list ['BTCUSDT-1m-2021-09-24', 'BTCUSDT-1m-2021-09-25', 'BTCUSDT-1m-2021-09-26']. MYBE THIS IS CORRECT
