@@ -5,7 +5,7 @@ CREATE TABLE binance_download_settings (
   `tick_interval` varchar(10) DEFAULT NULL,
   `stock_type` varchar(255) DEFAULT NULL,  
   `stock_exchange` varchar(255) DEFAULT NULL,  
-  `api_range_to_overwrite` int(11) DEFAULT NULL,  -- in seconds
+  `api_range_to_overwrite` int(11) DEFAULT NULL,  -- in seconds; change to current_range_to_overwrite
   `download_priority`int(11) NOT NULL,  
   `download_interval_sec`int(11) NOT NULL,  
   `download_setting_status_id` int(11) DEFAULT NULL,
