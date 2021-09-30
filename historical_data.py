@@ -1,4 +1,17 @@
 """
+FLOW:
+1. Import all lib that are needed
+2. Get DB credentials
+3. Open DB connection
+4. Monthly historicl data
+4.1. start condition: If monthly_update_from_files = 1
+4.1.1 download after date start_download_ux_timestamp if there are months to download before current
+after download update monthly_hist_first_run = 1
+after download update start_download_ux_timestamp to first day of month taht has been downloaded
+
+
+
+
 miesiecznie - 1 dnia kazdego miesiaca - jkis if z funkcja na koncu
 miesiecznie takze dla brakow
 dzienne = codziennie na zakonczenie dnia
@@ -68,7 +81,7 @@ def get_filenames_to_download_daily():
         day = start_date + timedelta(days=i)
         l.insert(i, "" + market +"-"+ tick_interval +"-"+ str(day)[0:10] +"")
         # print(day)
-    return (l)
+    return sorted(l)
 
 
 def get_filenames_to_download_monthly():
@@ -81,7 +94,7 @@ def get_filenames_to_download_monthly():
         day = start_date + timedelta(days=i)
         l.insert(i, "" + market +"-"+ tick_interval +"-"+ str(day)[0:7] +"")
         # print(day)
-    return list(set(l)) # works like distinct
+    return sorted(list(set(l))) # works like distinct
 
 
 
