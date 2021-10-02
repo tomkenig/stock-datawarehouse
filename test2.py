@@ -69,8 +69,7 @@ start_download_ux_timestamp = download_setting[0][9]
 
 # todo: function get single setting to download: curr, daily, monthly
 
-print(datetime.utcnow().timestamp())
-print(start_download_ux_timestamp)
+
 
 MONTHLY_HISTORY_DAYS = int(datetime.utcnow().timestamp())/86400 - start_download_ux_timestamp/86400
 print(MONTHLY_HISTORY_DAYS)
@@ -87,7 +86,7 @@ def delete_temp_catalog():
 def get_filenames_to_download_monthly():
     # todo: if is records get last + 1, else get all historical from last 62 days. GET ALSO MISSING DAYS <MAYBE OTHER FUNCTION WILL BE BETTER TO DO THIS????
     start_date = datetime.strptime(str(datetime.utcnow() - timedelta(days=MONTHLY_HISTORY_DAYS))[0:10], "%Y-%m-%d")
-    end_date = datetime.strptime(str(datetime.utcnow() - timedelta(days=0))[0:10], "%Y-%m-%d")
+    end_date = datetime.strptime(str(datetime.utcnow() - timedelta(days=1))[0:10], "%Y-%m-%d")
     delta = end_date - start_date
     l = []
     for i in range(delta.days + 1):
@@ -128,18 +127,23 @@ def get_monthly_files():
         print("delete done")
         # insert data
         for i in csv_data:
-            cursor.execute("INSERT INTO " + db_schema_name+"."+db_table_name +"(open_time, open, high, low, close, volume, close_time, quote_asset_volume, number_of_trades, taker_buy_base_asset_volume, taker_buy_quote_asset_volume, `ignore`, market, tick_interval, stock_type, stock_exchange) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], i[11], market, tick_interval, stock_type, stock_exchange))
-            print(i)
+            cursor.execute("INSERT INTO " + db_schema_name+"."+db_table_name + "(open_time, open, high, low, close, volume, close_time, quote_asset_volume, number_of_trades, taker_buy_base_asset_volume, taker_buy_quote_asset_volume, `ignore`, market, tick_interval, stock_type, stock_exchange) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], i[11], market, tick_interval, stock_type, stock_exchange))
+            # print(i)
 
-        cnxn.commit()
-        print("insert done")
+        print("insert done: " + FILENAME)
+
+
+        csv_data = csv.reader(open(FILE_PATH +".csv"))
+        new_time_start = min(csv_data)[0]
+
+
         # update settings with new start date
-        print(int(open_time_max/1000))
-        cursor.execute("UPDATE " + db_schema_name + "." + db_settings_table_name + " SET start_download_ux_timestamp = %s where download_settings_id = %s", (int(open_time_max/1000), download_settings_id))
-        print("update done")
+        cursor.execute("UPDATE  " + db_schema_name + "." + db_settings_table_name + " SET start_download_ux_timestamp = %s where download_settings_id = %s", (str(int(int(new_time_start)/1000)), str(download_settings_id)))
+        cnxn.commit()
+        print("update settings done")
 
         # delete files in tmp catalog
-        delete_temp_catalog()
+
 
     except:
         print("err_11: no file probably")
