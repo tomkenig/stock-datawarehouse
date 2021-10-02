@@ -20,7 +20,7 @@ db_table_name = sql_db_conn["db_table_name"]  # table_name
 db_settings_table_name = sql_db_conn["db_settings_table_name"]  # settings table name
 
 # open db connection
-cursor = cnxn.cursor()
+
 
 # todo: get this values from db or JSON. Make function
 # settings. In the nearest future, get settings from json file or DB
@@ -29,6 +29,7 @@ cursor = cnxn.cursor()
 ts = str(int(datetime.datetime.utcnow().timestamp()))
 print(ts)
 
+cursor = cnxn.cursor()
 cursor.execute("SELECT download_settings_id, market, tick_interval, stock_type, stock_exchange, current_range_to_overwrite, download_interval_sec FROM " + db_schema_name + "." + db_settings_table_name + " WHERE coalesce(next_download_ux_timestamp, 0) <= " + ts + " order by next_download_ux_timestamp asc limit 1")
 download_setting = cursor.fetchall()
 download_settings_id = download_setting[0][0]
