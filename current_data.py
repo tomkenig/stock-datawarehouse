@@ -31,6 +31,8 @@ db_settings_table_name = sql_db_conn["db_settings_table_name"]  # settings table
 # open db connection
 
 
+
+
 # todo: get this values from db or JSON. Make function
 # settings. In the nearest future, get settings from json file or DB
 # todo: Make function
@@ -46,6 +48,10 @@ stock_type = download_setting[0][3]
 stock_exchange = download_setting[0][4]
 range_to_download = download_setting[0][5]
 download_api_interval_sec = download_setting[0][6]
+
+# block current setting changing its status
+cursor.execute("UPDATE " + db_schema_name + "." + db_settings_table_name + " SET download_setting_status_id = %s where download_settings_id = %s", (1, download_settings_id))
+cnxn.commit()
 
 
 
@@ -71,7 +77,7 @@ def fn_insert_overwrite_last_data():
 
 def fn_updatesettings_queue():
     try:
-        cursor.execute("UPDATE " + db_schema_name + "." + db_settings_table_name + " SET last_download_ux_timestamp = %s, next_download_ux_timestamp = %s where download_settings_id = %s", (str(int(datetime.datetime.utcnow().timestamp())), str(int(str(int(datetime.datetime.utcnow().timestamp()))) + download_api_interval_sec), download_settings_id))
+        cursor.execute("UPDATE " + db_schema_name + "." + db_settings_table_name + " SET last_download_ux_timestamp = %s, next_download_ux_timestamp = %s, download_setting_status_id = %s where download_settings_id = %s", (str(int(datetime.datetime.utcnow().timestamp())), str(int(str(int(datetime.datetime.utcnow().timestamp()))) + download_api_interval_sec), 0, download_settings_id))
         print("update done")
         cnxn.commit()
         cursor.close()
