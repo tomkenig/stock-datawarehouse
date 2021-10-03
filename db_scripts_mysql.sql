@@ -1,28 +1,27 @@
 -- DROP TABLE binance_download_settings;
 CREATE TABLE binance_download_settings (
-  `download_settings_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `market` varchar(10) DEFAULT NULL,
-  `tick_interval` varchar(50) DEFAULT NULL,
-  `data_granulation`varchar(50) DEFAULT NULL,
-  `stock_type` varchar(255) DEFAULT NULL,  
-  `stock_exchange` varchar(255) DEFAULT NULL,  
-  `current_range_to_overwrite` int(11) DEFAULT NULL,  -- in seconds; change to current_range_to_overwrite
-  `download_priority`int(11) NOT NULL,  
-  `download_interval_sec`int(11) NOT NULL,  
-  `download_setting_status_id` int(11) DEFAULT NULL,
-  `download_settings_desc` varchar(255) DEFAULT NULL,
-  `download_current_update_from_api`  int(1) DEFAULT 1,
-  `daily_update_from_files`  int(1) DEFAULT 1,
-  `monthly_update_from_files`  int(1) DEFAULT 1,
-  `daily_hist_first_run` int(1) DEFAULT 0,
-  `monthly_hist_first_run`  int(1) DEFAULT 0,  
-  `daily_hist_complete` int(1) DEFAULT 0,
-  `monthly_hist_complete`  int(1) DEFAULT 0,  
+  `download_settings_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, -- unique setting identifier
+  `market` varchar(10) DEFAULT NULL, -- market pair ie. BTCUSDT; ETHUSDT etc.
+  `tick_interval` varchar(50) DEFAULT NULL, -- kline interval ie. 1m, 5m, 15m, 1h, 1M etc.
+  `data_granulation`varchar(50) DEFAULT NULL, -- data granulation ie. klines, trades, aggregated trades
+  `stock_type` varchar(255) DEFAULT NULL,  -- type of exchanege ie. spot
+  `stock_exchange` varchar(255) DEFAULT NULL,  -- stock exchange name ie. Binance.com, ByBit.com etc.
+  `current_range_to_overwrite` int(11) DEFAULT NULL,  -- how many intervals need to be overwrite/update when API module run
+  `download_priority`int(11) NOT NULL,  -- priority, if there are many of settings records 
+  `download_api_interval_sec`int(11) NOT NULL,  -- seconds to next overwrite current data from API
+  `download_setting_status_id` int(11) DEFAULT NULL, -- download status 0-actual, 1-in progress
+  `download_settings_desc` varchar(255) DEFAULT NULL, -- some text information about the setting, when you is needed
+  `current_update_from_api`  int(1) DEFAULT 1, -- data for single setting is provided using API
+  `daily_update_from_files`  int(1) DEFAULT 1, -- data for single setting is provided using daily files. Can be run once to get historical data
+  `monthly_update_from_files`  int(1) DEFAULT 1, -- data for single setting is provided using monthly files. Can be run once to get historical data
+  -- `daily_hist_first_run` int(1) DEFAULT 0, -- 
+  -- `monthly_hist_first_run`  int(1) DEFAULT 0, --  
+  `daily_hist_complete` int(1) DEFAULT 0, -- 
+  `monthly_hist_complete`  int(1) DEFAULT 0,  --  
   `start_download_ux_timestamp` int(10) DEFAULT 1483225200, -- 2017/01/01 00:00:00
-  `last_download_ux_timestamp` int(10) NULL,
-  `next_download_ux_timestamp` int(10) NULL,
-  `update_ux_timestamp` int(10) NULL, 
-  `insert_ux_timestamp` int(10) NULL
+  `last_download_ux_timestamp` int(10) NULL, -- 
+  `next_download_ux_timestamp` int(10) NULL, --
+  `insert_ux_timestamp` int(10) NULL --
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- DROP TABLE binance_klines_data;
