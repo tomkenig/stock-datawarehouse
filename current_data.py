@@ -33,7 +33,7 @@ def db_tables():
 
 
 # get settings to download
-def get_settings():
+def get_settings_current():
     db_schema_name, db_table_name, db_settings_table_name = db_tables()
     cursor, cnxn = db_connect()
     cursor.execute("SELECT download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, current_range_to_overwrite, download_api_interval_sec, daily_update_from_files, monthly_update_from_files FROM " + db_schema_name + "." + db_settings_table_name + " WHERE coalesce(next_download_ux_timestamp, 0) <= " + str(int(datetime.datetime.utcnow().timestamp())) + " order by next_download_ux_timestamp asc limit 1")
@@ -56,19 +56,19 @@ def get_settings():
 
 
 # get data from binance API
-def get_binance_current_data():
-    download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files = get_settings()
+def get_binance_data_current():
+    download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files = get_settings_current()
     url = "https://api.binance.com/api/v3/" + data_granulation + "?symbol=" + market + "&interval=" + tick_interval
     data = requests.get(url).json()
     return data[-range_to_download:]
 
 
 # insert and overwrite fresh data
-def insert_overwrite_current_data():
+def insert_overwrite_data_current():
     db_schema_name, db_table_name, db_settings_table_name = db_tables()
     cursor, cnxn = db_connect()
-    download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files = get_settings()
-    short_data = get_binance_current_data()
+    download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files = get_settings_current()
+    short_data = get_binance_data_current()
     try:
         cursor.execute("DELETE FROM " + db_schema_name+"."+db_table_name +" where open_time >= %s and market = %s and tick_interval = %s and data_granulation = %s  and stock_type = %s and stock_exchange = %s", (short_data[0][0], market, tick_interval, data_granulation, stock_type, stock_exchange))
         print("delete done")
@@ -83,7 +83,7 @@ def insert_overwrite_current_data():
 def update_settings_queue():
     db_schema_name, db_table_name, db_settings_table_name = db_tables()
     cursor, cnxn = db_connect()
-    download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files = get_settings()
+    download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files = get_settings_current()
     try:
         cursor.execute("UPDATE " + db_schema_name + "." + db_settings_table_name + " SET last_download_ux_timestamp = %s, next_download_ux_timestamp = %s, download_setting_status_id = %s where download_settings_id = %s", (str(int(datetime.datetime.utcnow().timestamp())), str(int(str(int(datetime.datetime.utcnow().timestamp()))) + download_api_interval_sec), 0, download_settings_id))
         print("update done")
@@ -95,5 +95,5 @@ def update_settings_queue():
 
 
 if __name__ == "__main__":
-    insert_overwrite_current_data()
+    insert_overwrite_data_current()
     update_settings_queue()

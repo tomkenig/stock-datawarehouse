@@ -34,6 +34,7 @@ from datetime import datetime, timedelta
 import math
 import zipfile
 import csv
+import current_data
 
 # get database connection credentials from JSON file
 with open('db_credentials.json') as json_conf:
