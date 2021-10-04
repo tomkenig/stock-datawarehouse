@@ -17,54 +17,58 @@ miesiecznie takze dla brakow
 dzienne = codziennie na zakonczenie dnia
 dziennine - takze dla brakow
 
-warunek wejscia - download_daily/monthly from files
-
-dodatkowo warto zbudowac macierz, ktora pokaze braki, jesli sa
+do matrix with gaps
 
 MONTHLY DATA FIRST THAN DAILY -
 add rollbacks and commits
 """
 
 # libs
-# import stockdwh_functions
 import requests
-import mysql.connector  # https://dev.mysql.com/doc/connector-python/en/
-import json
 from datetime import datetime, timedelta
+import datetime
 import math
 import zipfile
 import csv
-import current_data
+from db_works import db_connect, db_tables
+# import queue_works
 
-# get database connection credentials from JSON file
-with open('db_credentials.json') as json_conf:
-    sql_db_conn = (json.load(json_conf))
 
-# db driver (MySQL) connection settings
-cnxn = mysql.connector.connect(user=sql_db_conn["user"],
-                               password=sql_db_conn["password"],
-                               host=sql_db_conn["host"],
-                               database=sql_db_conn["database"])
+db_schema_name, db_table_name, db_settings_table_name = db_tables()
+cursor, cnxn = db_connect()
+TYPE = 'klines'
+APP_PATH = "tmp/"
 
-# destination
-db_schema_name = sql_db_conn["db_schema_name"]  # schema_name
-db_table_name = sql_db_conn["db_table_name"]  # table_name
-db_settings_table_name = sql_db_conn["db_settings_table_name"]  # settings table name
+def get_settings_hist():
+    cursor.execute("SELECT download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, "
+                   "current_range_to_overwrite, download_api_interval_sec, daily_update_from_files, monthly_update_from_files "
+                   "FROM " + db_schema_name + "." + db_settings_table_name + " WHERE daily_update_from_files = 1 and "
+                                                                             "coalesce(next_download_ux_timestamp, 0) <= "
+                   + str(int(datetime.datetime.utcnow().timestamp())) + " order by start_download_ux_timestamp asc limit 1")
+    download_setting = cursor.fetchall()
+    if len(download_setting) > 0:
+         download_settings_id = download_setting[0][0]
+         market = download_setting[0][1]
+         tick_interval = download_setting[0][2]
+         data_granulation = download_setting[0][3]
+         stock_type = download_setting[0][4]
+         stock_exchange = download_setting[0][5]
+         range_to_download = download_setting[0][6]
+         download_api_interval_sec = download_setting[0][7]
+         daily_update_from_files = download_setting[0][8]
+         monthly_update_from_files = download_setting[0][9]
+    else:
+         print("no data to download")
+         exit()
 
-# open db connection
-cursor = cnxn.cursor()
+    # block current setting changing its status
+    cursor.execute("UPDATE " + db_schema_name + "." + db_settings_table_name + " SET download_setting_status_id = %s where download_settings_id = %s", (1, download_settings_id))
+    cnxn.commit()
+    print("settings blocked")
+    return download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files
 
-cursor.execute("SELECT download_settings_id, market, tick_interval, stock_type, stock_exchange, current_range_to_overwrite, download_interval_sec, daily_update_from_files, monthly_update_from_files FROM " + db_schema_name + "." + db_settings_table_name + " WHERE daily_update_from_files = 1 and daily_hist_complete = 0 order by start_download_ux_timestamp asc limit 1")
-download_setting = cursor.fetchall()
-download_settings_id = download_setting[0][0]
-market = download_setting[0][1]
-tick_interval = download_setting[0][2]
-stock_type = download_setting[0][3]
-stock_exchange = download_setting[0][4]
-range_to_download = download_setting[0][5]
-download_interval_sec = download_setting[0][6]
-daily_update_from_files = download_setting[0][7]
-monthly_update_from_files = download_setting[0][8]
+
+download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files, start_hist_download_ux_timestamp = get_settings("monthly_hist")
 
 # todo: function get single setting to download: curr, daily, monthly
 
@@ -74,8 +78,8 @@ MONTHLY_HISTORY_DAYS = 30
 # todo: filenames to download # daily first in dev. Max Last 62 days
 def get_filenames_to_download_daily():
     # todo: if is records get last + 1, else get all historical from last 62 days. GET ALSO MISSING DAYS <MAYBE OTHER FUNCTION WILL BE BETTER TO DO THIS????
-    start_date = datetime.strptime(str(datetime.utcnow() - timedelta(days=DAILY_HISTORY_DAYS))[0:10], "%Y-%m-%d")
-    end_date = datetime.strptime(str(datetime.utcnow() - timedelta(days=1))[0:10], "%Y-%m-%d")
+    start_date = datetime.datetime.strptime(str(datetime.datetime.utcnow() - timedelta(days=DAILY_HISTORY_DAYS))[0:10], "%Y-%m-%d")
+    end_date = datetime.datetime.strptime(str(datetime.datetime.utcnow() - timedelta(days=1))[0:10], "%Y-%m-%d")
     delta = end_date - start_date
     l = []
     for i in range(delta.days + 1):
@@ -87,8 +91,8 @@ def get_filenames_to_download_daily():
 
 def get_filenames_to_download_monthly():
     # todo: if is records get last + 1, else get all historical from last 62 days. GET ALSO MISSING DAYS <MAYBE OTHER FUNCTION WILL BE BETTER TO DO THIS????
-    start_date = datetime.strptime(str(datetime.utcnow() - timedelta(days=MONTHLY_HISTORY_DAYS))[0:10], "%Y-%m-%d")
-    end_date = datetime.strptime(str(datetime.utcnow() - timedelta(days=0))[0:10], "%Y-%m-%d")
+    start_date = datetime.datetime.strptime(str(datetime.datetime.utcnow() - timedelta(days=MONTHLY_HISTORY_DAYS))[0:10], "%Y-%m-%d")
+    end_date = datetime.datetime.strptime(str(datetime.datetime.utcnow() - timedelta(days=0))[0:10], "%Y-%m-%d")
     delta = end_date - start_date
     l = []
     for i in range(delta.days + 1):
@@ -102,8 +106,7 @@ def get_filenames_to_download_monthly():
 print(get_filenames_to_download_daily())
 print(get_filenames_to_download_monthly())
 
-TYPE = 'klines'
-APP_PATH = "tmp/"
+
 
 
 def get_daily_files():
@@ -115,14 +118,15 @@ def get_daily_files():
     with zipfile.ZipFile(FILE_PATH + ".zip", "r") as zip_ref:
         zip_ref.extractall("tmp")
 
-    # insert file into DBMS
-    csv_data = csv.reader(open(FILE_PATH +".csv"))
-    open_time_min = min(csv_data)[0]
+    # get data from csv file
+    with open(FILE_PATH + ".csv") as file_handle:
+        csv_reader = csv.reader(file_handle)
+        csv_data = [row for row in csv_reader]
 
-    csv_data = csv.reader(open(FILE_PATH +".csv"))
+    open_time_min = min(csv_data)[0]
     open_time_max = max(csv_data)[0]
 
-    csv_data = csv.reader(open(FILE_PATH +".csv"))
+
     # delete old data to overwrite
     cursor.execute(
         "DELETE FROM " + db_schema_name + "." + db_table_name + " where open_time >= %s and open_time <= %s and tick_interval = %s and market = %s and stock_type = %s and stock_exchange = %s",

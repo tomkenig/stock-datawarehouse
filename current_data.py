@@ -2,35 +2,8 @@
 import requests
 import datetime
 from db_works import db_connect, db_tables
+import queue_works
 
-# get settings to download
-def get_settings_current():
-    cursor.execute("SELECT download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, "
-                   "current_range_to_overwrite, download_api_interval_sec, daily_update_from_files, monthly_update_from_files "
-                   "FROM " + db_schema_name + "." + db_settings_table_name + " WHERE current_update_from_api = 1 and "
-                                                                             "coalesce(next_download_ux_timestamp, 0) <= "
-                   + str(int(datetime.datetime.utcnow().timestamp())) + " order by next_download_ux_timestamp asc limit 1")
-    download_setting = cursor.fetchall()
-    if len(download_setting) > 0:
-         download_settings_id = download_setting[0][0]
-         market = download_setting[0][1]
-         tick_interval = download_setting[0][2]
-         data_granulation = download_setting[0][3]
-         stock_type = download_setting[0][4]
-         stock_exchange = download_setting[0][5]
-         range_to_download = download_setting[0][6]
-         download_api_interval_sec = download_setting[0][7]
-         daily_update_from_files = download_setting[0][8]
-         monthly_update_from_files = download_setting[0][9]
-    else:
-         print("no data to download")
-         exit()
-
-    # block current setting changing its status
-    cursor.execute("UPDATE " + db_schema_name + "." + db_settings_table_name + " SET download_setting_status_id = %s where download_settings_id = %s", (1, download_settings_id))
-    cnxn.commit()
-    print("settings blocked")
-    return download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files
 
 
 # get data from binance API
@@ -45,16 +18,16 @@ def insert_overwrite_data_current():
     short_data = get_binance_data_current()
     try:
         cursor.execute("DELETE FROM " + db_schema_name+"."+db_table_name +" where open_time >= %s and market = %s and tick_interval = %s and data_granulation = %s  "
-                                                                          "and stock_type = %s and stock_exchange = %s", (short_data[0][0], market, tick_interval, data_granulation, stock_type, stock_exchange))
+                                                                          "and stock_type = %s and stock_exchange = %s and download_settings_id = %s", (short_data[0][0], market, tick_interval, data_granulation, stock_type, stock_exchange, download_settings_id))
         print("delete done")
         for i in short_data:
             cursor.execute("INSERT INTO " + db_schema_name+"."+db_table_name +"(open_time, open, high, low, close, volume, close_time,"
                                                                               " quote_asset_volume, number_of_trades, taker_buy_base_asset_volume, "
                                                                               "taker_buy_quote_asset_volume, `ignore`, market, tick_interval, data_granulation,"
-                                                                              " stock_type, stock_exchange, insert_ux_timestamp) "
-                                                                              "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                                                                              " stock_type, stock_exchange, download_settings_id, insert_ux_timestamp) "
+                                                                              "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                            (i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], i[11],
-                            market, tick_interval, data_granulation, stock_type, stock_exchange,
+                            market, tick_interval, data_granulation, stock_type, stock_exchange, download_settings_id,
                             str(int(datetime.datetime.utcnow().timestamp()))))
         print("insert done")
         cnxn.commit()
@@ -82,7 +55,7 @@ def update_settings_queue_current():
 if __name__ == "__main__":
     db_schema_name, db_table_name, db_settings_table_name = db_tables()
     cursor, cnxn = db_connect()
-    download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files = get_settings_current()
+    download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files, start_hist_download_ux_timestamp = queue_works.get_settings("current")
     insert_overwrite_data_current()
     update_settings_queue_current()
     # close connection

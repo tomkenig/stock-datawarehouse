@@ -14,14 +14,12 @@ CREATE TABLE binance_download_settings (
   `current_update_from_api`  int(1) DEFAULT 1, -- data for single setting is provided using API
   `daily_update_from_files`  int(1) DEFAULT 1, -- data for single setting is provided using daily files. Can be run once to get historical data
   `monthly_update_from_files`  int(1) DEFAULT 1, -- data for single setting is provided using monthly files. Can be run once to get historical data
-  -- `daily_hist_first_run` int(1) DEFAULT 0, -- 
-  -- `monthly_hist_first_run`  int(1) DEFAULT 0, --  
   `daily_hist_complete` int(1) DEFAULT 0, -- 
-  `monthly_hist_complete`  int(1) DEFAULT 0,  --  
-  `start_download_ux_timestamp` int(10) DEFAULT 1483225200, -- 2017/01/01 00:00:00
-  `last_download_ux_timestamp` int(10) NULL, -- 
-  `next_download_ux_timestamp` int(10) NULL, --
-  `insert_ux_timestamp` int(10) NULL --
+  `monthly_hist_complete`  int(1) DEFAULT 0,  -- 
+  `start_hist_download_ux_timestamp` int(10) DEFAULT 1483225200, -- 2017/01/01 00:00:00
+  `last_download_ux_timestamp` int(10) NULL, -- only for current update
+  `next_download_ux_timestamp` int(10) NULL, -- only for current update
+  `insert_ux_timestamp` int(10) NULL -- record insert date
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- DROP TABLE binance_klines_data;
@@ -44,6 +42,7 @@ CREATE TABLE `binance_klines_data` (
   `stock_type` varchar(255) DEFAULT NULL,  
   `stock_exchange` varchar(255) DEFAULT NULL,  
  -- `update_ux_timestamp` int(10) NULL, -- to delete
+  `download_settings_id` int(11) NOT NULL, -- FK to binance_download_settings.download_settings_id unique setting identifier
   `insert_ux_timestamp` int(10) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
