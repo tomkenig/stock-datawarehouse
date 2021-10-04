@@ -1,3 +1,4 @@
+# todo: check commits and rollbacks
 # libs
 import requests
 import datetime
