@@ -1,5 +1,6 @@
 /tmp
 /venv
+/__pycache__
 db_credentials.json
 do.sh
 tests.py
