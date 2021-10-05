@@ -1,0 +1,10 @@
+/draft
+/tmp
+/venv
+/__pycache__
+db_credentials.json
+do.sh
+tests.py
+test2.py
+tests.py
+__pycache__/db_works.cpython-38.pyc
