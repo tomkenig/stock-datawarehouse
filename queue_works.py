@@ -22,6 +22,7 @@ def get_settings(interval_param_):
                        "FROM " + db_schema_name + "." + db_settings_table_name + " WHERE daily_update_from_files = 1 and "
                                                                                  "download_setting_status_id = 0 and "
                                                                                  "daily_hist_complete = 0 AND "
+                                                                                 "monthly_hist_complete = 1 AND "
                                                                                  "coalesce(start_hist_download_ux_timestamp, 0) <= "
                        + str(int(datetime.datetime.utcnow().timestamp())) + " order by start_hist_download_ux_timestamp asc limit 1")
     elif interval_param_ == "monthly_hist":
