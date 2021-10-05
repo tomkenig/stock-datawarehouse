@@ -1,5 +1,6 @@
-# todo: check commits and rollbacks
 # todo: DONE: work with monthly interwal - 1mo < works with files or 1M < works with API.
+# todo: check commits and rollbacks
+
 # libs
 import requests
 import datetime

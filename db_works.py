@@ -1,4 +1,4 @@
-import requests
+# libs
 import mysql.connector  # https://dev.mysql.com/doc/connector-python/en/
 import json
 

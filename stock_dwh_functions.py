@@ -4,7 +4,6 @@ from db_works import db_connect, db_tables
 import datetime
 
 
-
 def get_settings(interval_param_):
     db_schema_name, db_table_name, db_settings_table_name = db_tables()
     cursor, cnxn = db_connect()
@@ -16,6 +15,8 @@ def get_settings(interval_param_):
             "current_range_to_overwrite, download_api_interval_sec, daily_update_from_files, monthly_update_from_files, start_hist_download_ux_timestamp "
             "FROM " + db_schema_name + "." + db_settings_table_name + " WHERE current_update_from_api = 1 and "
                                                                       "download_setting_status_id = 0 and "
+                                                                      "daily_hist_complete = 1 AND "
+                                                                      "monthly_hist_complete = 1 AND "
                                                                       "coalesce(next_download_ux_timestamp, 0) <= "
             + str(int(datetime.datetime.utcnow().timestamp())) + " order by next_download_ux_timestamp asc limit 1")
     elif interval_param_ == "daily_hist":
