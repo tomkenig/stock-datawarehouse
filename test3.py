@@ -39,19 +39,6 @@ def get_filenames_to_download(interval_param_):
         # print(day)
     return sorted(list(set(l))) # works like distinct
 
-def get_filenames_to_download_daily():
-    # todo: if is records get last + 1, else get all historical from last 62 days. GET ALSO MISSING DAYS <MAYBE OTHER FUNCTION WILL BE BETTER TO DO THIS????
-    hist_days = int(datetime.datetime.utcnow().timestamp()) / 86400 - start_hist_download_ux_timestamp / 86400
-    start_date = datetime.datetime.strptime(str(datetime.datetime.utcnow() - timedelta(days=hist_days))[0:10], "%Y-%m-%d")
-    end_date = datetime.datetime.strptime(str(datetime.datetime.utcnow() - timedelta(days=1))[0:10], "%Y-%m-%d")
-    delta = end_date - start_date
-    l = []
-    for i in range(delta.days + 1):
-        day = start_date + timedelta(days=i)
-        l.insert(i, "" + market +"-"+ tick_interval +"-"+ str(day)[0:10] +"")
-        # print(day)
-    return sorted(l)
-
 
 def get_files_monthly():
     # todo: file import
@@ -117,3 +104,8 @@ if __name__ == "__main__":
     cnxn.commit()
     cursor.close()
     cnxn.close()
+
+    print(get_filenames_to_download("daily_hist") # !!!!!!!!!!!!!!!!!!!!!! WHEN YOU ADD DAILY FILES, YOU CAN ERASE MONTHLY. MAYBE FIRST GET DAILY? OR MAYBE START FROM start_hist_download_ux_timestamp
+    # or first get one more time settings. BUT YOU CAN CHOOSE WHAT COMBINATION WILL YOU GOT
+    # but you can choose priority!!!!!.
+    # remember that record can be blocked
