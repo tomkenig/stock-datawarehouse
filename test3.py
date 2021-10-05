@@ -1,5 +1,6 @@
 # todo: check commits and rollbacks
 # todo: get_filenames_to_download_monthly and get_filenames_to_download_daily can be one function
+# todo: daily can start when monthly is completed
 
 # libs
 import requests
@@ -24,13 +25,21 @@ def get_filenames_to_download(interval_param_):
     # todo: if is records get last + 1, else get all historical from last 62 days. GET ALSO MISSING DAYS <MAYBE OTHER FUNCTION WILL BE BETTER TO DO THIS????
     if interval_param_ == "monthly_hist":
         date_length = 7
+        hist_days = int(datetime.datetime.utcnow().timestamp()) / 86400 - start_hist_download_ux_timestamp / 86400 # for monthly_files
     elif interval_param_ == "daily_hist":
         date_length = 10
+        hist_days = 35 # for all daily files
+    elif interval_param_ == "monthly_update":
+        date_length = 7
+        hist_days = 1
+    elif interval_param_ == "daily_update":
+        date_length = 10
+        hist_days = 3
     else:
         date_length = 10
-    hist_days = int(datetime.datetime.utcnow().timestamp()) / 86400 - start_hist_download_ux_timestamp / 86400
+
     start_date = datetime.datetime.strptime(str(datetime.datetime.utcnow() - timedelta(days=hist_days))[0:10], "%Y-%m-%d")
-    end_date = datetime.datetime.strptime(str(datetime.datetime.utcnow() - timedelta(days=0))[0:10], "%Y-%m-%d")
+    end_date = datetime.datetime.strptime(str(datetime.datetime.utcnow() - timedelta(days=1))[0:10], "%Y-%m-%d") # 2021/10/05 changed 0 to 1
     delta = end_date - start_date
     l = []
     for i in range(delta.days + 1):
@@ -100,12 +109,25 @@ if __name__ == "__main__":
         except Exception as e:
             print(e)
 
+    # daily
+    delete_old_files()
+    download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files, start_hist_download_ux_timestamp = queue_works.get_settings(
+        "daily_hist")
+    for k in get_filenames_to_download("daily_hist"):
+        try:
+             file_path = TMP_PATH + k
+             base_url = "https://data.binance.vision/data/"+stock_type+"/daily/"+data_granulation+"/"+market+"/"+tick_interval+"/"+k+".zip"
+             get_files_monthly()
+             cnxn.commit()
+        except Exception as e:
+            print(e)
+
 
     cnxn.commit()
     cursor.close()
     cnxn.close()
 
-    print(get_filenames_to_download("daily_hist") # !!!!!!!!!!!!!!!!!!!!!! WHEN YOU ADD DAILY FILES, YOU CAN ERASE MONTHLY. MAYBE FIRST GET DAILY? OR MAYBE START FROM start_hist_download_ux_timestamp
+    #  print(get_filenames_to_download("daily_hist")  # !!!!!!!!!!!!!!!!!!!!!! WHEN YOU ADD DAILY FILES, YOU CAN ERASE MONTHLY. MAYBE FIRST GET DAILY? OR MAYBE START FROM start_hist_download_ux_timestamp
     # or first get one more time settings. BUT YOU CAN CHOOSE WHAT COMBINATION WILL YOU GOT
     # but you can choose priority!!!!!.
     # remember that record can be blocked
