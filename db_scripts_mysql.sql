@@ -47,22 +47,6 @@ CREATE TABLE `binance_klines_data` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
--- DROP TABLE binance_hist_update_data_log;
-CREATE TABLE binance_hist_update_data_log (
-  `historical_data_log_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `market` varchar(10) DEFAULT NULL,
-  `tick_interval` varchar(255) DEFAULT NULL,
-  `stock_type` varchar(255) DEFAULT NULL,  
-  `stock_exchange` varchar(255) DEFAULT NULL,
-  `file_interval` varchar(255) DEFAULT NULL,
-  `hist_date_name` varchar(255) DEFAULT NULL,
-  `rec_count` bigint DEFAULT NULL,
-  `historical_update_status` int DEFAULT NULL,
-  `update_ux_timestamp` int(10) NULL,
-  `insert_ux_timestamp` int(10) NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
 -- DROP VIEW `vw_binance_klines_anl`;
 CREATE VIEW `vw_binance_klines_anl` AS
     SELECT 
@@ -82,8 +66,8 @@ CREATE VIEW `vw_binance_klines_anl` AS
         `a`.`tick_interval` AS `tick_interval`,
         `a`.`stock_exchange` AS `stock_exchange`,
         `a`.`insert_ux_timestamp` AS `insert_timestamp`,
-        FROM_UNIXTIME((`a`.`open_time` / 1000)) AS `open_datetime`,
-        FROM_UNIXTIME((`a`.`close_time` / 1000)) AS `close_datetime`
+        convert_tz(FROM_UNIXTIME(`a`.`open_time` / 1000), 'SYSTEM', 'UTC')AS `open_datetime`,
+        convert_tz(FROM_UNIXTIME(`a`.`close_time` / 1000), 'SYSTEM', 'UTC') AS `close_datetime`
     FROM
         `binance_klines_data` `a`;
 

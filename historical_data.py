@@ -2,6 +2,7 @@
 # todo: get_filenames_to_download_monthly and get_filenames_to_download_daily can be one function
 # todo: daily can start when monthly is completed
 # todo: parallel start historical_data can have a problem - files deletion in one instance, when other instace works with files. Crash
+# todo: fix setting status id problem < need set to default on error
 
 # libs
 import requests
@@ -10,7 +11,7 @@ import datetime
 import zipfile
 import csv
 from db_works import db_connect, db_tables
-import queue_works
+import stock_dwh_functions
 import os
 
 # path to downloaded files
@@ -99,7 +100,7 @@ if __name__ == "__main__":
     else monthly completed and daily not completed: get daily only
     """
     # monthly
-    download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files, start_hist_download_ux_timestamp = queue_works.get_settings(
+    download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files, start_hist_download_ux_timestamp = stock_dwh_functions.get_settings(
         "monthly_hist")
     for k in get_filenames_to_download("monthly_hist"):
         try:
@@ -122,7 +123,7 @@ if __name__ == "__main__":
 
     # daily
     delete_old_files()
-    download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files, start_hist_download_ux_timestamp = queue_works.get_settings(
+    download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files, start_hist_download_ux_timestamp = stock_dwh_functions.get_settings(
         "daily_hist")
     for k in get_filenames_to_download("daily_hist"):
         try:

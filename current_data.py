@@ -1,15 +1,16 @@
 # todo: check commits and rollbacks
+# todo: DONE: work with monthly interwal - 1mo < works with files or 1M < works with API.
 # libs
 import requests
 import datetime
 from db_works import db_connect, db_tables
-import queue_works
+import stock_dwh_functions
 
 
 
 # get data from binance API
 def get_binance_data_current():
-    url = "https://api.binance.com/api/v3/" + data_granulation + "?symbol=" + market + "&interval=" + tick_interval
+    url = "https://api.binance.com/api/v3/" + data_granulation + "?symbol=" + market + "&interval=" + (tick_interval).replace('1mo', '1M')
     data = requests.get(url).json()
     return data[-range_to_download:]
 
@@ -56,7 +57,7 @@ def update_settings_queue_current():
 if __name__ == "__main__":
     db_schema_name, db_table_name, db_settings_table_name = db_tables()
     cursor, cnxn = db_connect()
-    download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files, start_hist_download_ux_timestamp = queue_works.get_settings("current")
+    download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files, start_hist_download_ux_timestamp = stock_dwh_functions.get_settings("current")
     insert_overwrite_data_current()
     update_settings_queue_current()
     # close connection

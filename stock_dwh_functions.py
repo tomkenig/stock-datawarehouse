@@ -1,3 +1,5 @@
+# TODO: change name to queue
+
 from db_works import db_connect, db_tables
 import datetime
 
@@ -60,6 +62,4 @@ def get_settings(interval_param_):
     print("settings blocked")
     return download_settings_id, market, tick_interval, data_granulation, stock_type, stock_exchange, range_to_download, download_api_interval_sec, daily_update_from_files, monthly_update_from_files, start_hist_download_ux_timestamp
 
-
 print()
-
