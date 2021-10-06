@@ -74,7 +74,7 @@ def get_files_monthly():
     # insert data
     for i in csv_data:
         cursor.execute("INSERT INTO " + db_schema_name+"."+db_table_name +"(open_time, open, high, low, close, volume, close_time, quote_asset_volume, number_of_trades, taker_buy_base_asset_volume, taker_buy_quote_asset_volume, `ignore`, market, tick_interval, data_granulation, stock_type, stock_exchange, download_settings_id, insert_ux_timestamp) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], i[11], market, tick_interval, data_granulation, stock_type, stock_exchange, download_settings_id, str(int(datetime.datetime.utcnow().timestamp()))))
-        print(i)
+        # print(i)
     print("insert done")
 
     # update settings
