@@ -64,6 +64,8 @@ CREATE VIEW `vw_binance_klines_anl` AS
         `a`.`ignore` AS `ignore`,
         `a`.`market` AS `market`,
         `a`.`tick_interval` AS `tick_interval`,
+        `a`.`data_granulation` AS `data_granulation`,
+        `a`.`stock_type` AS `stock_type`,
         `a`.`stock_exchange` AS `stock_exchange`,
         `a`.`insert_ux_timestamp` AS `insert_timestamp`,
         convert_tz(FROM_UNIXTIME(`a`.`open_time` / 1000), 'SYSTEM', 'UTC')AS `open_datetime`,
