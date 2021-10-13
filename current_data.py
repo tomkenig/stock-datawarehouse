@@ -1,6 +1,7 @@
 # todo: DONE: work with monthly interwal - 1mo < works with files or 1M < works with API.
 # todo: check commits and rollbacks
-
+# todo: montly 1m and 1w intervals doesn't insert last and next timestamps
+# todo: change columns names: daily(monthly)_update_from_files > update_from_daily(monthly)_files
 # libs
 import requests
 import datetime
