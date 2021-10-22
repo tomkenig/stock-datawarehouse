@@ -2,6 +2,7 @@
 /tmp
 /venv
 /__pycache__
+/exports
 db_credentials.json
 do.sh
 tests.py

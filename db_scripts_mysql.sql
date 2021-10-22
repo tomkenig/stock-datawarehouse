@@ -67,11 +67,13 @@ CREATE VIEW `vw_binance_klines_anl` AS
         `a`.`data_granulation` AS `data_granulation`,
         `a`.`stock_type` AS `stock_type`,
         `a`.`stock_exchange` AS `stock_exchange`,
+        `a`.`download_settings_id` AS `download_settings_id`,
         `a`.`insert_ux_timestamp` AS `insert_timestamp`,
         convert_tz(FROM_UNIXTIME(`a`.`open_time` / 1000), 'SYSTEM', 'UTC')AS `open_datetime`,
         convert_tz(FROM_UNIXTIME(`a`.`close_time` / 1000), 'SYSTEM', 'UTC') AS `close_datetime`
     FROM
-        `binance_klines_data` `a`;
+        `binance_klines_data` `a`
+        order by `a`.`open_time`;
 
 
 
