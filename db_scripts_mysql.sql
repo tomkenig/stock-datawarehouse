@@ -1,3 +1,10 @@
+-- CRYPTO MARKET
+-- CRYPTO MARKET
+-- CRYPTO MARKET
+-- -- BINANCE OHLC DATA
+-- -- BINANCE OHLC DATA
+-- -- BINANCE OHLC DATA
+
 -- DROP TABLE binance_download_settings;
 CREATE TABLE binance_download_settings (
   `download_settings_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, -- unique setting identifier
@@ -120,3 +127,23 @@ INSERT INTO binance_download_settings (market, tick_interval, data_granulation, 
 INSERT INTO binance_download_settings (market, tick_interval, data_granulation, stock_type, stock_exchange, current_range_to_overwrite, download_priority, download_api_interval_sec, daily_update_from_files, monthly_update_from_files, insert_ux_timestamp) VALUES ('LTCUSDT', '1w', 'klines', 'spot', 'Binance.com', 2, 900, 12000, 0, 1, unix_timestamp());
 INSERT INTO binance_download_settings (market, tick_interval, data_granulation, stock_type, stock_exchange, current_range_to_overwrite, download_priority, download_api_interval_sec, daily_update_from_files, monthly_update_from_files, insert_ux_timestamp) VALUES ('LTCUSDT', '1mo', 'klines', 'spot', 'Binance.com', 2, 1000, 12000, 0, 1, unix_timestamp());
 INSERT INTO binance_download_settings (market, tick_interval, data_granulation, stock_type, stock_exchange, current_range_to_overwrite, download_priority, download_api_interval_sec, daily_update_from_files, monthly_update_from_files, insert_ux_timestamp) VALUES ('ETHUSDT', '1m', 'klines', 'spot', 'Binance.com', 20, 100, 120, 1, 1, unix_timestamp());
+
+
+
+-- -- CRYPTO FEAR AND GREED INDEX
+-- -- CRYPTO FEAR AND GREED INDEX
+-- -- CRYPTO FEAR AND GREED INDEX
+
+-- DROP TABLE fear_and_greed_index_data;
+CREATE TABLE fear_and_greed_index_data (
+`fagi_id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, -- unique setting identifier
+`value`  int(10) NULL,
+`value_classification` varchar(50) NULL,
+`timestamp` bigint(20) NULL,
+`date_utc_timestamp` timestamp NULL,
+`insert_timestamp` timestamp DEFAULT current_timestamp() -- record insert date
+);
+
+
+
+
