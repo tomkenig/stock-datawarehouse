@@ -136,12 +136,12 @@ INSERT INTO binance_download_settings (market, tick_interval, data_granulation, 
 
 -- DROP TABLE fear_and_greed_index_data;
 CREATE TABLE fear_and_greed_index_data (
-`fagi_id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY, -- unique setting identifier
-`value`  int(10) NULL,
-`value_classification` varchar(50) NULL,
-`timestamp` bigint(20) NULL,
-`date_utc_timestamp` timestamp NULL,
-`insert_timestamp` timestamp DEFAULT current_timestamp() -- record insert date
+    `fagi_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `value` INT(10) NULL,
+    `value_classification` VARCHAR(50) NULL,
+    `timestamp` BIGINT(20) NULL,
+    `date_utc_timestamp` TIMESTAMP NULL,
+    `insert_timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ()
 );
 
 
