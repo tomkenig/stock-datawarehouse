@@ -18,23 +18,29 @@ from db_works import db_connect, db_tables
 db_schema_name, db_table_name, db_settings_table_name = db_tables()
 cursor, cnxn = db_connect()
 
-# how many periods need to be overwrite on every run
 # get settings from json
 def get_fagi_settings_json():
     with open("global_config.json") as json_conf:
         fagi_conf = (json.load(json_conf))
     print("conf file opened")
     periods_to_overwrite = fagi_conf["periods_to_overwrite"]
-    return periods_to_overwrite
+    db_fagi_schema_name = fagi_conf["db_fagi_schema_name"]
+    db_fagi_table_name = fagi_conf["db_fagi_table_name"]
+    return periods_to_overwrite, db_fagi_schema_name, db_fagi_table_name
 
-periods_to_overwrite = get_fagi_settings_json()
+periods_to_overwrite, db_fagi_schema_name, db_fagi_table_name = get_fagi_settings_json()
 
-print(periods_to_overwrite)
+print(periods_to_overwrite, db_fagi_schema_name, db_fagi_table_name)
 
-def check_is_firs_run():
-    print("first run ever")
-
+#def check_is_first_run():
+cursor.execute("SELECT max(timestamp) FROM " + db_fagi_schema_name + "." + db_fagi_table_name + " ")
+max_timestamp = cursor.fetchall()[0][0]
+if max_timestamp != None:
     print("next run with overwrite")
+    return max_timestamp
+else:
+    print("first run ever")
+    return 0
 
 
 def get_fagi_data():

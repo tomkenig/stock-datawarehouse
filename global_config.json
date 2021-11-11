@@ -1,6 +1,6 @@
 {
   "setting_name": "CRYPTO Fear and greed index FAGI",
   "periods_to_overwrite": 3,
-  "db_fagi_schema_name": "m1174_stock_dwh",
+  "db_fagi_schema_name": "m1174_st_dwh_dev",
   "db_fagi_table_name": "fear_and_greed_index_data"
 }
