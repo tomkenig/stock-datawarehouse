@@ -10,6 +10,10 @@ Application or view on database transforms OHLC data
 Market data are downloaded and can by start by crontab or other Task Manager
 Application use historical data and API data to get current OHLC values
 
+# Data
+Binance klines data
+Fear and greed index
+
 # Future:
 Data repair processes are implemented. In case of situatuation, when there is no data to download or connection are temporary broken / lost
 There is also repair process witch downloads daily data once a day that overwrite data

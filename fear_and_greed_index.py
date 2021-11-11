@@ -35,12 +35,14 @@ print(periods_to_overwrite, db_fagi_schema_name, db_fagi_table_name)
 #def check_is_first_run():
 cursor.execute("SELECT max(timestamp) FROM " + db_fagi_schema_name + "." + db_fagi_table_name + " ")
 max_timestamp = cursor.fetchall()[0][0]
-if max_timestamp != None:
-    print("next run with overwrite")
-    return max_timestamp
-else:
-    print("first run ever")
-    return 0
+print("srdfhg")
+print(max_timestamp)
+#if max_timestamp <> None:
+#    print("next run with overwrite")
+#    return max_timestamp
+#else:
+#    print("first run ever")
+#    return 0
 
 
 def get_fagi_data():
