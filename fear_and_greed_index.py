@@ -15,8 +15,6 @@ import requests
 from datetime import datetime
 from db_works import db_connect, db_tables
 
-db_schema_name, db_table_name, db_settings_table_name = db_tables()
-cursor, cnxn = db_connect()
 
 # get settings from json
 def get_fagi_settings_json():
@@ -28,8 +26,6 @@ def get_fagi_settings_json():
     db_fagi_table_name = fagi_conf["db_fagi_table_name"]
     return periods_to_overwrite, db_fagi_schema_name, db_fagi_table_name
 
-periods_to_overwrite, db_fagi_schema_name, db_fagi_table_name = get_fagi_settings_json()
-print(periods_to_overwrite, db_fagi_schema_name, db_fagi_table_name)
 
 def check_is_first_run():
     cursor.execute("SELECT max(timestamp), count(1) FROM " + db_fagi_schema_name + "." + db_fagi_table_name + " ")
@@ -43,9 +39,6 @@ def check_is_first_run():
         print("first run ever")
         return 0
 
-max_timestamp = check_is_first_run()
-print(check_is_first_run())
-
 
 def get_periods_to_overwrite():
     if max_timestamp !=0:
@@ -54,21 +47,16 @@ def get_periods_to_overwrite():
         final_periods_to_overwrite = 10000
     return final_periods_to_overwrite
 
-final_periods_to_overwrite = get_periods_to_overwrite()
 
 def get_fagi_data():
     url = "https://api.alternative.me/fng/?limit=10000"
     data = requests.get(url).json()
     return data
 
-data = get_fagi_data()
-print(data["data"][0:final_periods_to_overwrite])
 
-
-# todo: insert all periods at first run
 def insert_overwrite_data_fagi_current():
     # delete
-    cursor.execute("DELETE FROM " + db_fagi_schema_name + "." + db_fagi_table_name + " where timestamp > " + str(max_timestamp-86400*final_periods_to_overwrite) + "")
+    cursor.execute("DELETE FROM " + db_fagi_schema_name + "." + db_fagi_table_name + " where timestamp > " + str(max_timestamp - 86400*final_periods_to_overwrite) + "")
     print("old rows deleted")
     # insert
     if data["metadata"]["error"] == None:
@@ -86,9 +74,25 @@ def insert_overwrite_data_fagi_current():
             print(datetime.utcfromtimestamp(int(i["timestamp"])))
 
     cnxn.commit()
-
     print("new rows inserted")
     return print("insert_overwrite_data_fagi_current done")
 
-insert_overwrite_data_fagi_current()
+
+
+if __name__ == "__main__":
+    db_schema_name, db_table_name, db_settings_table_name = db_tables()
+    cursor, cnxn = db_connect()
+
+    periods_to_overwrite, db_fagi_schema_name, db_fagi_table_name = get_fagi_settings_json()
+    print(periods_to_overwrite, db_fagi_schema_name, db_fagi_table_name)
+
+    max_timestamp = check_is_first_run()
+    print(check_is_first_run())
+
+    final_periods_to_overwrite = get_periods_to_overwrite()
+
+    data = get_fagi_data()
+    print(data["data"][0:final_periods_to_overwrite])
+
+    insert_overwrite_data_fagi_current()
 
