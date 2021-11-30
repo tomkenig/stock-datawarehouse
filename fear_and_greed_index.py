@@ -29,21 +29,32 @@ def get_fagi_settings_json():
     return periods_to_overwrite, db_fagi_schema_name, db_fagi_table_name
 
 periods_to_overwrite, db_fagi_schema_name, db_fagi_table_name = get_fagi_settings_json()
-
 print(periods_to_overwrite, db_fagi_schema_name, db_fagi_table_name)
 
-#def check_is_first_run():
-cursor.execute("SELECT max(timestamp) FROM " + db_fagi_schema_name + "." + db_fagi_table_name + " ")
-max_timestamp = cursor.fetchall()[0][0]
-print("srdfhg")
-print(max_timestamp)
-#if max_timestamp <> None:
-#    print("next run with overwrite")
-#    return max_timestamp
-#else:
-#    print("first run ever")
-#    return 0
+def check_is_first_run():
+    cursor.execute("SELECT max(timestamp), count(1) FROM " + db_fagi_schema_name + "." + db_fagi_table_name + " ")
+    query_result = cursor.fetchall()
+    max_timestamp = query_result[0][0]
+    rec_cnt = query_result[0][1]
+    if rec_cnt != 0:
+        print("next run with overwrite")
+        return max_timestamp
+    else:
+        print("first run ever")
+        return 0
 
+max_timestamp = check_is_first_run()
+print(check_is_first_run())
+
+
+def get_periods_to_overwrite():
+    if max_timestamp !=0:
+        final_periods_to_overwrite = periods_to_overwrite
+    else:
+        final_periods_to_overwrite = 10000
+    return final_periods_to_overwrite
+
+final_periods_to_overwrite = get_periods_to_overwrite()
 
 def get_fagi_data():
     url = "https://api.alternative.me/fng/?limit=10000"
@@ -51,31 +62,33 @@ def get_fagi_data():
     return data
 
 data = get_fagi_data()
-print(data["data"][0:periods_to_overwrite])
+print(data["data"][0:final_periods_to_overwrite])
 
 
 # todo: insert all periods at first run
-
 def insert_overwrite_data_fagi_current():
-    #cursor.execute("DELETE FROM " + db_schema_name + "."  + "fear_and_greed", (download_settings_id))
+    # delete
+    cursor.execute("DELETE FROM " + db_fagi_schema_name + "." + db_fagi_table_name + " where timestamp > " + str(max_timestamp-86400*final_periods_to_overwrite) + "")
     print("old rows deleted")
+    # insert
+    if data["metadata"]["error"] == None:
+        print(" metadata ok")
+        for i in data["data"][0:final_periods_to_overwrite]:
+            print("go")
+            cursor.execute(
+                "INSERT INTO " + db_fagi_schema_name + "." + db_fagi_table_name +
+                "(value, value_classification, timestamp, date_utc_timestamp) values "
+                "(%s, %s, %s, %s)", (i["value"], i["value_classification"], i["timestamp"],
+                                     datetime.utcfromtimestamp(int(i["timestamp"]))))
+            print(i["value"])
+            print(i["value_classification"])
+            print(i["timestamp"])
+            print(datetime.utcfromtimestamp(int(i["timestamp"])))
+
+    cnxn.commit()
+
     print("new rows inserted")
+    return print("insert_overwrite_data_fagi_current done")
 
+insert_overwrite_data_fagi_current()
 
-# todo: delete last periods from database
-
-# todo: insert new periods
-
-
-if data["metadata"]["error"] == None:
-    print("ok")
-    for i in data["data"][0:periods_to_overwrite]:
-        print(i["value"])
-        print(i["value_classification"])
-        print(i["timestamp"])
-        print(datetime.utcfromtimestamp(int(i["timestamp"])))
-
-
-
-
-# print(data["metadata"]["error"])
