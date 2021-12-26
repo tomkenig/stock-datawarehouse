@@ -56,7 +56,7 @@ def get_fagi_data():
 
 def insert_overwrite_data_fagi_current():
     # delete
-    cursor.execute("DELETE FROM " + db_fagi_schema_name + "." + db_fagi_table_name + " where timestamp > " + str(max_timestamp - 86400 * final_periods_to_overwrite) + "")
+    cursor.execute("DELETE FROM " + db_fagi_schema_name + "." + db_fagi_table_name + " where timestamp > " + str(max_timestamp - 86400 * (final_periods_to_overwrite-1) + "")
     print("old rows deleted")
     # insert
     if data["metadata"]["error"] == None:
