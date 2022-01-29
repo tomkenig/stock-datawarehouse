@@ -54,34 +54,6 @@ def get_fagi_data():
     return data
 
 
-def get_min_timestamp_to_overwrite(in_data):
-    min_timestamp_to_overwrite = (data["data"][0:final_periods_to_overwrite])[-1]["timestamp"]
-    return min_timestamp_to_overwrite
-
-
-def insert_overwrite_data_fagi_current(in_min_timestamp_to_overwrite):
-    # delete
-    cursor.execute("DELETE FROM " + db_fagi_schema_name + "." + db_fagi_table_name + " where timestamp >= " + str(in_min_timestamp_to_overwrite )+ "")
-    print("old rows deleted")
-    # insert
-    if data["metadata"]["error"] == None:
-        print(" metadata ok")
-        for i in data["data"][0:final_periods_to_overwrite]:
-            print("go")
-            cursor.execute(
-                "INSERT INTO " + db_fagi_schema_name + "." + db_fagi_table_name +
-                "(value, value_classification, timestamp, date_utc_timestamp) values "
-                "(%s, %s, %s, %s)", (i["value"], i["value_classification"], i["timestamp"],
-                                     datetime.utcfromtimestamp(int(i["timestamp"]))))
-            print(i["value"])
-            print(i["value_classification"])
-            print(i["timestamp"])
-            print(datetime.utcfromtimestamp(int(i["timestamp"])))
-
-    cnxn.commit()
-    print("new rows inserted")
-    return print("insert_overwrite_data_fagi_current done")
-
 
 
 if __name__ == "__main__":
@@ -97,7 +69,8 @@ if __name__ == "__main__":
     final_periods_to_overwrite = get_periods_to_overwrite()
 
     data = get_fagi_data()
-    min_timestamp_to_overwrite = get_min_timestamp_to_overwrite(data)
 
-    insert_overwrite_data_fagi_current(min_timestamp_to_overwrite)
+    data_short = (data["data"][0:final_periods_to_overwrite])
+
+    print(data_short[-1]["timestamp"])
 
