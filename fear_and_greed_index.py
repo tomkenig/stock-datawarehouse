@@ -5,9 +5,6 @@
 # Example URL: https://api.alternative.me/fng/?limit=10&format=csv
 # Example URL: https://api.alternative.me/fng/?limit=10&format=csv&date_format=us
  """
-# todo: start and load into rdbms
-# todo: first time get all historical periods
-# todo: when first run is done, get only the newrst data
 
 # Libs
 import json
@@ -100,4 +97,3 @@ if __name__ == "__main__":
     min_timestamp_to_overwrite = get_min_timestamp_to_overwrite(data)
 
     insert_overwrite_data_fagi_current(min_timestamp_to_overwrite)
-
