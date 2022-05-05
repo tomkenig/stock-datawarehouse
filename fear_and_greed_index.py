@@ -12,8 +12,8 @@ import requests
 from datetime import datetime
 from db_works import db_connect, db_tables
 
-
-# get settings from json
+# todo: get only new periods
+# get settings from config json
 def get_fagi_settings_json():
     with open("global_config.json") as json_conf:
         fagi_conf = (json.load(json_conf))
@@ -41,7 +41,7 @@ def get_periods_to_overwrite():
     if max_timestamp !=0:
         final_periods_to_overwrite = periods_to_overwrite
     else:
-        final_periods_to_overwrite = 10000
+        final_periods_to_overwrite = 10000  # for example 10 000. Number wont be reach.
     return final_periods_to_overwrite
 
 
