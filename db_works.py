@@ -28,3 +28,6 @@ def db_tables():
     db_settings_table_name = sql_db_conn["db_settings_table_name"]  # settings table name
     print("db_tables done")
     return db_schema_name, db_table_name, db_settings_table_name
+
+db_schema_name, db_table_name, db_settings_table_name = db_tables()
+

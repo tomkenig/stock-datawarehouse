@@ -5,7 +5,7 @@
 # Example URL: https://api.alternative.me/fng/?limit=10&format=csv
 # Example URL: https://api.alternative.me/fng/?limit=10&format=csv&date_format=us
  """
-
+## Version: 0.1
 # Libs
 import json
 import requests
@@ -82,7 +82,6 @@ def insert_overwrite_data_fagi_current(in_min_timestamp_to_overwrite):
 
 
 if __name__ == "__main__":
-    db_schema_name, db_table_name, db_settings_table_name = db_tables()
     cursor, cnxn = db_connect()
 
     periods_to_overwrite, db_fagi_schema_name, db_fagi_table_name = get_fagi_settings_json()
